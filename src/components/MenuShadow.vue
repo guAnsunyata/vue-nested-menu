@@ -1,11 +1,11 @@
 <template>
-    <transition name="fade">
+    <transition name="vmenu-fade">
         <div v-if="isActive" @click="handleShadowClicked" class="vmenu-shadow"></div>
     </transition>
 </template>
 
 <script>
-    
+
 export default {
     props: {
         isActive: {
@@ -20,7 +20,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
 
 .vmenu-shadow {
     position: fixed;
@@ -33,11 +33,11 @@ export default {
     z-index: 99997;
 }
 
-.fade-enter-active, .fade-leave-active {
+.vmenu-fade-enter-active, .vmenu-fade-leave-active {
     transition: opacity .5s;
 }
 
-.fade-enter, .fade-leave-to {
+.vmenu-fade-enter, .vmenu-fade-leave-to {
     opacity: 0;
 }
 </style>

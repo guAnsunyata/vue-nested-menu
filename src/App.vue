@@ -1,88 +1,46 @@
 <template>
-	<div class="Nav">
-	    <div @click="clickBurger" class="Nav__burger">
-	        <MenuIcon />
-	    </div>
+	<div class="Menu">
 
-        <Shadow :isActive="isActive" :handleShadowClicked="clickShadow"></Shadow>
+        <MenuBurger :handleBurgerClicked="clickBurger" />
 
-	    <div class="Nav__panel-wrapper"
+        <MenuShadow :isActive="isActive" :handleShadowClicked="clickShadow" />
+
+	    <div class="Menu__panel-wrapper"
             :class="{'isActive': isActive}"
             :style="[style_wrapperStyle, isActive ? style_wrapperActiveStyle : {}]"
         >
 
 	        <!-- prev -->
-	        <div class="Nav__panel"
-                :style="[style_panelStyle, panel_prevPositionStyle, (isTranslating) ? style_transitionStyle : {}]"
-	            ref="prev"
-	        >
-	            <div v-if="content_prevItem.title" class="Nav__header"> <span v-show="prevItemHasParent" class="arrow">
-	                	<LeftArrowIcon />
-	                </span>
-	                {{ content_prevItem.title }}
-	            </div>
-
-	            <ul class="Nav__list">
-	                <li v-for="item in content_prevItem.children"
-	                    class="Nav__item"
-	                >
-	                    <div class="text">{{ item.title }}</div>
-	                    <span v-show="item.children.length > 0" class="arrow">
-	                    	<RightArrowIcon />
-	                    </span>
-	                </li>
-	            </ul>
-	        </div>
+            <MenuPanel
+                :list="content_prevItem"
+                :functionalityStyle="style_panelStyle"
+                :positionStyle="panel_prevPositionStyle"
+                :isTranslating="isTranslating"
+                :transitionStyle="style_transitionStyle"
+                :showHeaderArrow="prevItemHasParent"
+            />
 
 	        <!-- staging -->
-	        <div class="Nav__panel"
-                :style="[style_panelStyle, panel_stagingPositionStyle, (isTranslating) ? style_transitionStyle : {}]"
-	            ref="staging"
-	        >
-	            <div v-if="content_currentItem.title" @click="clickPrevItem()" class="Nav__header">
-	                <span v-show="currentItemHasParent" class="arrow">
-	                	<LeftArrowIcon />
-	                </span>
-	                {{ content_currentItem.title }}
-	            </div>
+            <MenuPanel
+                :list="content_currentItem"
+                :functionalityStyle="style_panelStyle"
+                :positionStyle="panel_stagingPositionStyle"
+                :isTranslating="isTranslating"
+                :transitionStyle="style_transitionStyle"
+                :showHeaderArrow="currentItemHasParent"
+                :handleHeaderClicked="clickPrevItem"
+                :handleItemClicked="clickNextItem"
+            />
 
-	            <ul class="Nav__list">
-	                <li v-for="item in content_currentItem.children"
-	                    @click="clickNextItem(item)"
-	                    class="Nav__item"
-	                >
-	                    <div class="text">{{ item.title }}</div>
-	                    <span v-show="item.children.length > 0" class="arrow">
-	                    	<RightArrowIcon />
-	                    </span>
-	                </li>
-	            </ul>
-	        </div>
-
-	        <!-- next -->
-	        <div class="Nav__panel"
-                :style="[style_panelStyle, panel_nextPositionStyle, (isTranslating) ? style_transitionStyle : {}]"
-	            ref="next"
-	        >
-	            <div v-if="content_nextItem" class="Nav__header">
-	                <span class="arrow">
-	                	<LeftArrowIcon />
-	                </span>
-	                {{ content_nextItem.title }}
-	            </div>
-
-	            <ul class="Nav__list">
-	                <li v-for="item in content_nextItem.children"
-	                    class="Nav__item"
-	                >
-	                    <div class="text">{{ item.title }}</div>
-	                    <span v-show="item.children.length > 0" class="arrow">
-	                    	<RightArrowIcon />
-	                    </span>
-	                </li>
-	            </ul>
-	        </div>
-
+            <!-- next -->
+            <MenuPanel
+                :list="content_nextItem"
+                :functionalityStyle="style_panelStyle"
+                :positionStyle="panel_nextPositionStyle"
+                :isTranslating="isTranslating"
+                :transitionStyle="style_transitionStyle"
+                :showHeaderArrow="true"
+            />
 	    </div>
 	</div>
 </template>
@@ -90,14 +48,15 @@
 <script>
 import demoData from './demo-data.js';
 
-import MenuIcon from './icons/MenuIcon';
-import RightArrowIcon from './icons/RightArrowIcon';
-import LeftArrowIcon from './icons/LeftArrowIcon';
-import Shadow from './components/Shadow';
-
 import functionalityStyle from './mixins/functionalityStyle.mixin';
 import panelControl from './mixins/panelControl.mixin';
 import contentControl from './mixins/contentControl.mixin';
+
+import RightArrowIcon from './icons/RightArrowIcon';
+import LeftArrowIcon from './icons/LeftArrowIcon';
+import MenuBurger from './components/MenuBurger';
+import MenuShadow from './components/MenuShadow';
+import MenuPanel from './components/MenuPanel';
 
 export default {
     mixins: [
@@ -106,10 +65,11 @@ export default {
         contentControl,
     ],
     components: {
-        MenuIcon,
         RightArrowIcon,
         LeftArrowIcon,
-        Shadow,
+        MenuBurger,
+        MenuShadow,
+        MenuPanel,
     },
     props: {
         panelWidth: {
@@ -242,66 +202,3 @@ export default {
     },
 };
 </script>
-
-<style lang="scss" scoped>
-
-ul, li {
-    padding: 0;
-    margin: 0;
-}
-
-.Nav__burger {
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-}
-
-.Nav__header {
-    display: flex;
-    align-items: center;
-    padding-left: 35px;
-    height: 50px;
-    color: #fff;
-    font-size: 16px;
-    background-color: #232f3e;
-    cursor: pointer;
-
-    .arrow {
-        padding-top: 2px;
-        fill: #fff;
-        margin-right: 10px;
-        width: 10px;
-        height: 100%;
-        display: flex;
-        align-items: center;
-    }
-}
-
-.Nav__list {
-    list-style: none;
-    padding-bottom: 2px;
-
-    .separator {
-        border-bottom: 1px solid #d5dbdb;
-        padding: 2px 0 0 0;
-        margin: 0;
-    }
-}
-
-.Nav__item {
-    padding-left: 35px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-
-    .arrow {
-        padding-top: 2px;
-        padding-left: 15px;
-        display: flex;
-        align-items: center;
-        width: 10px;
-        height: 100%;
-    }
-}
-</style>
