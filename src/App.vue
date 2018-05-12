@@ -6,11 +6,14 @@
 
         <Shadow :isActive="isActive" :handleShadowClicked="clickShadow"></Shadow>
 
-	    <div class="Nav__panel-wrapper" :class="{'isActive': isActive}">
+	    <div class="Nav__panel-wrapper"
+            :class="{'isActive': isActive}"
+            :style="[style_wrapperStyle, isActive ? style_wrapperActiveStyle : {}]"
+        >
 
 	        <!-- prev -->
 	        <div class="Nav__panel"
-                :class="[panel_prevPositionClass, {'translating': isTranslating }]"
+                :style="[style_panelStyle, panel_prevPositionStyle, (isTranslating) ? style_transitionStyle : {}]"
 	            ref="prev"
 	        >
 	            <div v-if="content_prevItem.title" class="Nav__header"> <span v-show="prevItemHasParent" class="arrow">
@@ -33,7 +36,7 @@
 
 	        <!-- staging -->
 	        <div class="Nav__panel"
-	            :class="[panel_stagingPositionClass, {'translating': isTranslating }]"
+                :style="[style_panelStyle, panel_stagingPositionStyle, (isTranslating) ? style_transitionStyle : {}]"
 	            ref="staging"
 	        >
 	            <div v-if="content_currentItem.title" @click="clickPrevItem()" class="Nav__header">
@@ -58,7 +61,7 @@
 
 	        <!-- next -->
 	        <div class="Nav__panel"
-                :class="[panel_nextPositionClass, {'translating': isTranslating }]"
+                :style="[style_panelStyle, panel_nextPositionStyle, (isTranslating) ? style_transitionStyle : {}]"
 	            ref="next"
 	        >
 	            <div v-if="content_nextItem" class="Nav__header">
@@ -92,11 +95,13 @@ import RightArrowIcon from './icons/RightArrowIcon';
 import LeftArrowIcon from './icons/LeftArrowIcon';
 import Shadow from './components/Shadow';
 
-import panelControl from './mixins/panelControl';
-import contentControl from './mixins/contentControl';
+import functionalityStyle from './mixins/functionalityStyle.mixin';
+import panelControl from './mixins/panelControl.mixin';
+import contentControl from './mixins/contentControl.mixin';
 
 export default {
     mixins: [
+        functionalityStyle,
         panelControl,
         contentControl,
     ],
@@ -106,13 +111,24 @@ export default {
         LeftArrowIcon,
         Shadow,
     },
+    props: {
+        panelWidth: {
+            type: Number,
+            default: 300,
+        },
+        menuOpenSpeed: {
+            type: Number,
+            default: 350,
+        },
+        menuSwitchSpeed: {
+            type: Number,
+            default: 250,
+        },
+    },
     data() {
         return {
             data: demoData,
             isActive: false,
-
-            // config
-            panelWidth: 300,
             isTranslating: false,
         };
     },
@@ -228,50 +244,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-// functionality css
-
-$panel-width: 300px;
-
-.Nav__panel-wrapper {
-    overflow: hidden;
-    width: $panel-width;
-    position: absolute;
-    top: 0;
-    left: -$panel-width;
-    z-index: 99999;
-    height: 100vh;
-    transition: left .35s;
-
-    &.isActive {
-        left: 0;
-    }
-}
-
-.Nav__panel {
-    position: absolute;
-    top: 0;
-    z-index: 99999;
-    height: 100vh;
-    width: $panel-width;
-    background-color: #fff;
-
-    &.staging {
-        left: 0;
-    }
-
-    &.prev {
-        left: -$panel-width;
-    }
-
-    &.next {
-        left: $panel-width;
-    }
-
-    &.translating {
-        transition: left .3s;
-    }
-}
 
 ul, li {
     padding: 0;
