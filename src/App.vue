@@ -10,17 +10,17 @@
 
 	        <!-- prev -->
 	        <div class="Nav__panel"
-                :class="[prevPositionClass, {'translating': isTranslating }]"
+                :class="[panel_prevPositionClass, {'translating': isTranslating }]"
 	            ref="prev"
 	        >
-	            <div v-if="prevItem.title" class="Nav__header"> <span v-show="prevItemHasParent" class="arrow">
+	            <div v-if="content_prevItem.title" class="Nav__header"> <span v-show="prevItemHasParent" class="arrow">
 	                	<LeftArrowIcon />
 	                </span>
-	                {{ prevItem.title }}
+	                {{ content_prevItem.title }}
 	            </div>
 
 	            <ul class="Nav__list">
-	                <li v-for="item in prevItem.children"
+	                <li v-for="item in content_prevItem.children"
 	                    class="Nav__item"
 	                >
 	                    <div class="text">{{ item.title }}</div>
@@ -33,19 +33,19 @@
 
 	        <!-- staging -->
 	        <div class="Nav__panel"
-	            :class="[stagingPositionClass, {'translating': isTranslating }]"
+	            :class="[panel_stagingPositionClass, {'translating': isTranslating }]"
 	            ref="staging"
 	        >
-	            <div v-if="currentItem.title" @click="clickItemBack()" class="Nav__header">
+	            <div v-if="content_currentItem.title" @click="clickPrevItem()" class="Nav__header">
 	                <span v-show="currentItemHasParent" class="arrow">
 	                	<LeftArrowIcon />
 	                </span>
-	                {{ currentItem.title }}
+	                {{ content_currentItem.title }}
 	            </div>
 
 	            <ul class="Nav__list">
-	                <li v-for="item in currentItem.children"
-	                    @click="clickItem(item)"
+	                <li v-for="item in content_currentItem.children"
+	                    @click="clickNextItem(item)"
 	                    class="Nav__item"
 	                >
 	                    <div class="text">{{ item.title }}</div>
@@ -58,18 +58,18 @@
 
 	        <!-- next -->
 	        <div class="Nav__panel"
-                :class="[nextPositionClass, {'translating': isTranslating }]"
+                :class="[panel_nextPositionClass, {'translating': isTranslating }]"
 	            ref="next"
 	        >
-	            <div v-if="nextItem" class="Nav__header">
+	            <div v-if="content_nextItem" class="Nav__header">
 	                <span class="arrow">
 	                	<LeftArrowIcon />
 	                </span>
-	                {{ nextItem.title }}
+	                {{ content_nextItem.title }}
 	            </div>
 
 	            <ul class="Nav__list">
-	                <li v-for="item in nextItem.children"
+	                <li v-for="item in content_nextItem.children"
 	                    class="Nav__item"
 	                >
 	                    <div class="text">{{ item.title }}</div>
@@ -86,13 +86,20 @@
 
 <script>
 import demoData from './demo-data.js';
+
 import MenuIcon from './icons/MenuIcon';
 import RightArrowIcon from './icons/RightArrowIcon';
 import LeftArrowIcon from './icons/LeftArrowIcon';
-
 import Shadow from './components/Shadow';
 
+import panelControl from './mixins/panelControl';
+import contentControl from './mixins/contentControl';
+
 export default {
+    mixins: [
+        panelControl,
+        contentControl,
+    ],
     components: {
         MenuIcon,
         RightArrowIcon,
@@ -107,28 +114,17 @@ export default {
             // config
             panelWidth: 300,
             isTranslating: false,
-
-            // menu state
-            prevItem: {},
-            currentItem: {},
-            nextItem: {},
-            parentStack: [],
-
-            // panel position control
-            prevPositionClass: 'prev',
-            stagingPositionClass: 'staging',
-            nextPositionClass: 'next',
         };
     },
     mounted() {
-        this.currentItem = this.data;
+        this.content_currentItem = this.data;
     },
     computed: {
         currentItemHasParent() {
-            return this.parentStack.length >= 1;
+            return this.content_parentStack.length >= 1;
         },
         prevItemHasParent() {
-            return this.parentStack.length >= 2;
+            return this.content_parentStack.length >= 2;
         },
     },
     methods: {
@@ -138,7 +134,7 @@ export default {
         clickShadow() {
             this.isActive = false;
         },
-        clickItem(targetItem) {
+        clickNextItem(targetItem) {
 
             if (this.isTranslating) {
                 return;
@@ -152,8 +148,7 @@ export default {
 
             this.slideToNext(targetItem);
         },
-        // slide menu
-        clickItemBack() {
+        clickPrevItem() {
 
             if (this.isTranslating || !this.currentItemHasParent) {
                 return;
@@ -162,18 +157,21 @@ export default {
             this.slideToPrev();
         },
 
-        // handle panel and item
+        /*
+         * main part of core
+         * definite of how to handle panel sliding and item updating
+         */
         slideToNext(targetItem) {
 
             // set target item as content of next panel
-            this.setNextItem(targetItem);
+            this.content_setNextItem(targetItem);
 
             // switch animation on
             this.setTranslating(true);
 
             // activate panel sliding with animation after `.translating` class has updated to panel dom.
             this.$nextTick(() => {
-                this.slidePanelNext();
+                this.panel_slideNext();
             });
 
             // reset panel position
@@ -182,19 +180,21 @@ export default {
         slideToPrev() {
 
             // set prev item which is the parent of the current item.
-            this.setPrevItem();
+            this.content_setPrevItem();
 
             // switch animation on
             this.setTranslating(true);
 
             // activate panel sliding with animation after `.translating` class has updated to panel dom.
             this.$nextTick(() => {
-                this.slidePanelBack();
+                this.panel_slideBack();
             });
 
             // reset panel position
             this.homingAfterTranslatingBack();
         },
+
+        // handle homing after slide animation end
         homingAfterTranslatingNext() {
             setTimeout(() => {
 
@@ -202,11 +202,11 @@ export default {
                 this.setTranslating(false);
 
                 // push current to parent stack
-                this.pushCurrentToParentStack();
+                this.content_pushCurrentToParentStack();
 
                 // homing
-                this.homingPanelPosition(); // reset panel position just like the beginning.
-                this.homingItemAfterNext(); // change item between these panels to meet updated panel position.
+                this.panel_homingPosition(); // reset panel position just like the beginning.
+                this.content_homingItemAfterNext(); // change item between these panels to meet updated panel position.
             }, 300);
         },
         homingAfterTranslatingBack() {
@@ -214,46 +214,9 @@ export default {
                 this.setTranslating(false);
 
                 // homing
-                this.homingPanelPosition();
-                this.homingItemAfterBack();
+                this.panel_homingPosition();
+                this.content_homingItemAfterBack();
             }, 300);
-        },
-
-        // menu content controls
-        setNextItem(targetItem) {
-            this.nextItem = targetItem;
-        },
-        setPrevItem() {
-            this.prevItem = this.parentStack[this.parentStack.length - 1]; // the prev content is the parent of the current item.
-        },
-        homingItemAfterNext() { // reset item after panel homing
-            this.prevItem = this.currentItem;
-            this.currentItem = this.nextItem;
-            this.nextItem = [];
-        },
-        homingItemAfterBack() {
-            this.parentStack.pop(); // update parent stack
-            this.currentItem = this.prevItem;
-            this.nextItem = [];
-        },
-        pushCurrentToParentStack(item) {
-            const parent = this.currentItem;
-            this.parentStack.push(parent);
-        },
-
-        // panel position controls
-        slidePanelNext() {
-            this.stagingPositionClass = 'prev';
-            this.nextPositionClass = 'staging';
-        },
-        slidePanelBack() {
-            this.stagingPositionClass = 'next';
-            this.prevPositionClass = 'staging';
-        },
-        homingPanelPosition() {
-            this.prevPositionClass = 'prev';
-            this.nextPositionClass = 'next';
-            this.stagingPositionClass = 'staging';
         },
 
         // utils
@@ -266,37 +229,7 @@ export default {
 
 <style lang="scss" scoped>
 
-ul, li {
-    padding: 0;
-    margin: 0;
-}
-
-.Nav__burger {
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-}
-
-.Nav__header {
-    display: flex;
-    align-items: center;
-    padding-left: 35px;
-    height: 50px;
-    color: #fff;
-    font-size: 16px;
-    background-color: #232f3e;
-    cursor: pointer;
-
-    .arrow {
-        padding-top: 2px;
-        fill: #fff;
-        margin-right: 10px;
-        width: 10px;
-        height: 100%;
-        display: flex;
-        align-items: center;
-    }
-}
+// functionality css
 
 $panel-width: 300px;
 
@@ -337,6 +270,38 @@ $panel-width: 300px;
 
     &.translating {
         transition: left .3s;
+    }
+}
+
+ul, li {
+    padding: 0;
+    margin: 0;
+}
+
+.Nav__burger {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.Nav__header {
+    display: flex;
+    align-items: center;
+    padding-left: 35px;
+    height: 50px;
+    color: #fff;
+    font-size: 16px;
+    background-color: #232f3e;
+    cursor: pointer;
+
+    .arrow {
+        padding-top: 2px;
+        fill: #fff;
+        margin-right: 10px;
+        width: 10px;
+        height: 100%;
+        display: flex;
+        align-items: center;
     }
 }
 
