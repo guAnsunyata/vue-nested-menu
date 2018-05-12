@@ -63,6 +63,8 @@ export default {
             type: Function,
             default: () => {},
         },
+
+        // @TODO: create createMenuPanel.js to assign `functionalityStyle` which is not diff from next, staging, and prev panel in parent component.
         functionalityStyle: {
             type: Object,
             required: true,
