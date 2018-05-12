@@ -4,26 +4,48 @@ const panelControl = {
     // panel position control
     data() {
         return {
-            panel_prevPositionClass: 'prev',
-            panel_stagingPositionClass: 'staging',
-            panel_nextPositionClass: 'next',
+            panel_prevPositionStyle: {},
+            panel_stagingPositionStyle: {},
+            panel_nextPositionStyle: {},
         };
+    },
+    mounted() {
+        this.panel_prevPositionStyle = this.$_panelControl_positionSet['prev'];
+        this.panel_stagingPositionStyle = this.$_panelControl_positionSet['staging'];
+        this.panel_nextPositionStyle = this.$_panelControl_positionSet['next'];
+
+        console.log(this.$_panelControl_positionSet);
+    },
+    computed: {
+        $_panelControl_positionSet() {
+            return {
+                staging: {
+                    left: 0,
+                },
+                prev: {
+                    left: `-${this.panelWidth}px`,
+                },
+                next: {
+                    left: `${this.panelWidth}px`,
+                },
+            };
+        },
     },
 
     // panel position s
     methods: {
         panel_slideNext() {
-            this.panel_stagingPositionClass = 'prev';
-            this.panel_nextPositionClass = 'staging';
+            this.panel_stagingPositionStyle = this.$_panelControl_positionSet['prev'];
+            this.panel_nextPositionStyle = this.$_panelControl_positionSet['staging'];
         },
         panel_slideBack() {
-            this.panel_stagingPositionClass = 'next';
-            this.panel_prevPositionClass = 'staging';
+            this.panel_stagingPositionStyle = this.$_panelControl_positionSet['next'];;
+            this.panel_prevPositionStyle = this.$_panelControl_positionSet['staging'];
         },
         panel_homingPosition() {
-            this.panel_prevPositionClass = 'prev';
-            this.panel_nextPositionClass = 'next';
-            this.panel_stagingPositionClass = 'staging';
+            this.panel_prevPositionStyle = this.$_panelControl_positionSet['prev'];
+            this.panel_nextPositionStyle = this.$_panelControl_positionSet['next'];
+            this.panel_stagingPositionStyle = this.$_panelControl_positionSet['staging'];
         },
     },
 };

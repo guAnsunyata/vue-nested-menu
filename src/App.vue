@@ -6,11 +6,15 @@
 
         <Shadow :isActive="isActive" :handleShadowClicked="clickShadow"></Shadow>
 
-	    <div class="Nav__panel-wrapper" :class="{'isActive': isActive}">
+	    <div class="Nav__panel-wrapper"
+            :class="{'isActive': isActive}"
+            :style="[wrapperStyle, isActive ? wrapperActiveStyle : {}]"
+        >
 
 	        <!-- prev -->
 	        <div class="Nav__panel"
-                :class="[panel_prevPositionClass, {'translating': isTranslating }]"
+                :class="{'translating': isTranslating }"
+                :style="[panelStyle, panel_prevPositionStyle]"
 	            ref="prev"
 	        >
 	            <div v-if="content_prevItem.title" class="Nav__header"> <span v-show="prevItemHasParent" class="arrow">
@@ -33,7 +37,8 @@
 
 	        <!-- staging -->
 	        <div class="Nav__panel"
-	            :class="[panel_stagingPositionClass, {'translating': isTranslating }]"
+	            :class="{'translating': isTranslating }"
+                :style="[panelStyle, panel_stagingPositionStyle]"
 	            ref="staging"
 	        >
 	            <div v-if="content_currentItem.title" @click="clickPrevItem()" class="Nav__header">
@@ -58,7 +63,8 @@
 
 	        <!-- next -->
 	        <div class="Nav__panel"
-                :class="[panel_nextPositionClass, {'translating': isTranslating }]"
+                :class="{'translating': isTranslating }"
+                :style="[panelStyle, panel_nextPositionStyle]"
 	            ref="next"
 	        >
 	            <div v-if="content_nextItem" class="Nav__header">
@@ -95,6 +101,36 @@ import Shadow from './components/Shadow';
 import panelControl from './mixins/panelControl';
 import contentControl from './mixins/contentControl';
 
+// user config
+const PANEL_WIDTH = 300;
+const SLIDE_DURATION = 3500;
+
+const transitionSecond = `.${SLIDE_DURATION / 100}s`;
+
+const wrapperStyle = {
+    width: `${PANEL_WIDTH}px`,
+    position: `absolute`,
+    top: 0,
+    left: `-${PANEL_WIDTH}px`,
+    zIndex: 99999,
+    height: `100vh`,
+    overflow: `hidden`,
+    transition: `left ${transitionSecond}`,
+};
+
+const wrapperActiveStyle = {
+    left: 0,
+};
+
+const panelStyle = {
+    position: `absolute`,
+    top: 0,
+    zIndex: 99999,
+    height: `100vh`,
+    width: `${PANEL_WIDTH}px`,
+    backgroundColor: `#fff`,
+};
+
 export default {
     mixins: [
         panelControl,
@@ -106,14 +142,25 @@ export default {
         LeftArrowIcon,
         Shadow,
     },
+    props: {
+        panelWidth: {
+            type: Number,
+            default: 300,
+        },
+    },
     data() {
         return {
             data: demoData,
             isActive: false,
 
-            // config
-            panelWidth: 300,
+            // @temp config
             isTranslating: false,
+
+            // @TODO dynacmic width from props
+            // style
+            wrapperStyle,
+            wrapperActiveStyle,
+            panelStyle,
         };
     },
     mounted() {
@@ -234,18 +281,18 @@ export default {
 $panel-width: 300px;
 
 .Nav__panel-wrapper {
-    overflow: hidden;
-    width: $panel-width;
-    position: absolute;
-    top: 0;
-    left: -$panel-width;
-    z-index: 99999;
-    height: 100vh;
-    transition: left .35s;
+    // overflow: hidden;
+    // width: $panel-width;
+    // position: absolute;
+    // top: 0;
+    // left: -$panel-width;
+    // z-index: 99999;
+    // height: 100vh;
+    // transition: left .35s;
 
-    &.isActive {
-        left: 0;
-    }
+    // &.isActive {
+    //     left: 0;
+    // }
 }
 
 .Nav__panel {
