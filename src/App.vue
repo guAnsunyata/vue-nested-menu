@@ -9,12 +9,11 @@
 	    <div class="Nav__panel-wrapper" :class="{'isActive': isActive}">
 
 	        <!-- prev -->
-	        <div class="Nav__panel prev"
-	            :class="{'translating': isTranslating}"
+	        <div class="Nav__panel"
+                :class="[prevPositionClass, {'translating': isTranslating }]"
 	            ref="prev"
 	        >
-	            <div v-if="prevItem.title" class="Nav__header">
-	                <span v-show="prevItemHasParent" class="arrow">
+	            <div v-if="prevItem.title" class="Nav__header"> <span v-show="prevItemHasParent" class="arrow">
 	                	<LeftArrowIcon />
 	                </span>
 	                {{ prevItem.title }}
@@ -34,7 +33,7 @@
 
 	        <!-- staging -->
 	        <div class="Nav__panel"
-	            :class="{'translating': isTranslating}"
+	            :class="[stagingPositionClass, {'translating': isTranslating }]"
 	            ref="staging"
 	        >
 	            <div v-if="currentItem.title" @click="clickItemBack()" class="Nav__header">
@@ -58,8 +57,8 @@
 	        </div>
 
 	        <!-- next -->
-	        <div class="Nav__panel next"
-	            :class="{'translating': isTranslating}"
+	        <div class="Nav__panel"
+                :class="[nextPositionClass, {'translating': isTranslating }]"
 	            ref="next"
 	        >
 	            <div v-if="nextItem" class="Nav__header">
@@ -105,16 +104,20 @@ export default {
             data: demoData,
             isActive: false,
 
+            // config
+            panelWidth: 300,
+            isTranslating: false,
+
             // menu state
             prevItem: {},
             currentItem: {},
             nextItem: {},
-
             parentStack: [],
 
-            // config
-            panelWidth: 300,
-            isTranslating: false,
+            // panel position control
+            prevPositionClass: 'prev',
+            stagingPositionClass: 'staging',
+            nextPositionClass: 'next',
         };
     },
     mounted() {
@@ -129,16 +132,17 @@ export default {
         },
     },
     methods: {
-    	// burger
     	clickBurger() {
     		this.isActive = !this.isActive;
     	},
         clickShadow() {
             this.isActive = false;
         },
-
-    	// slide menu
         clickItem(targetItem) {
+
+            if (this.isTranslating) {
+                return;
+            }
 
             // go to link
             if (targetItem.children.length <= 0) {
@@ -146,100 +150,110 @@ export default {
                 return;
             }
 
-            if (this.isTranslating) {
-                return;
-            }
-
-            // change data
-            this.nextItem = targetItem;
-
-            // animate
-            this.setTranslating(true);
-
-            this.$nextTick(() => {
-
-                this.slideNext();
-
-                setTimeout(() => {
-                    this.setTranslating(false);
-
-                    // push current to parent stack
-                    const parent = this.currentItem;
-                    this.parentStack.push(parent);
-
-                    // reset
-                    this.prevItem = this.currentItem;
-                    this.currentItem = this.nextItem;
-                    this.nextItem = [];
-                    this.resetPosition();
-                }, 300);
-            });
+            this.slideToNext(targetItem);
         },
+        // slide menu
         clickItemBack() {
 
             if (this.isTranslating || !this.currentItemHasParent) {
                 return;
             }
 
-            // change data
-            this.prevItem = this.parentStack[this.parentStack.length - 1];
-            // animate
+            this.slideToPrev();
+        },
+
+        // handle panel and item
+        slideToNext(targetItem) {
+
+            // set target item as content of next panel
+            this.setNextItem(targetItem);
+
+            // switch animation on
             this.setTranslating(true);
 
+            // activate panel sliding with animation after `.translating` class has updated to panel dom.
             this.$nextTick(() => {
-
-                this.slideBack();
-
-                setTimeout(() => {
-                    this.setTranslating(false);
-
-                    // reset
-                    this.parentStack.pop(); //
-                    this.currentItem = this.prevItem;
-                    this.nextItem = [];
-                    this.resetPosition();
-                }, 300);
+                this.slidePanelNext();
             });
+
+            // reset panel position
+            this.homingAfterTranslatingNext();
+        },
+        slideToPrev() {
+
+            // set prev item which is the parent of the current item.
+            this.setPrevItem();
+
+            // switch animation on
+            this.setTranslating(true);
+
+            // activate panel sliding with animation after `.translating` class has updated to panel dom.
+            this.$nextTick(() => {
+                this.slidePanelBack();
+            });
+
+            // reset panel position
+            this.homingAfterTranslatingBack();
+        },
+        homingAfterTranslatingNext() {
+            setTimeout(() => {
+
+                // switch off transition state of panel
+                this.setTranslating(false);
+
+                // push current to parent stack
+                this.pushCurrentToParentStack();
+
+                // homing
+                this.homingPanelPosition(); // reset panel position just like the beginning.
+                this.homingItemAfterNext(); // change item between these panels to meet updated panel position.
+            }, 300);
+        },
+        homingAfterTranslatingBack() {
+            setTimeout(() => {
+                this.setTranslating(false);
+
+                // homing
+                this.homingPanelPosition();
+                this.homingItemAfterBack();
+            }, 300);
         },
 
-        // next & back
-        slideNext() {
-            const stagingElemnt = this.$refs.staging;
-            Object.assign(stagingElemnt.style, {
-                left: `-${this.panelWidth}px`,
-            });
-
-            const nextElement = this.$refs.next;
-            Object.assign(nextElement.style, {
-                left: `0px`,
-            });
+        // menu content controls
+        setNextItem(targetItem) {
+            this.nextItem = targetItem;
         },
-        slideBack() {
-            const stagingElemnt = this.$refs.staging;
-            Object.assign(stagingElemnt.style, {
-                left: `${this.panelWidth}px`,
-            });
-
-            const prevElement = this.$refs.prev;
-            Object.assign(prevElement.style, {
-                left: `0px`,
-            });
+        setPrevItem() {
+            this.prevItem = this.parentStack[this.parentStack.length - 1]; // the prev content is the parent of the current item.
         },
-        resetPosition() {
-            const stagingElemnt = this.$refs.staging;
-            Object.assign(stagingElemnt.style, {
-                left: `0px`,
-            });
+        homingItemAfterNext() { // reset item after panel homing
+            this.prevItem = this.currentItem;
+            this.currentItem = this.nextItem;
+            this.nextItem = [];
+        },
+        homingItemAfterBack() {
+            this.parentStack.pop(); // update parent stack
+            this.currentItem = this.prevItem;
+            this.nextItem = [];
+        },
+        pushCurrentToParentStack(item) {
+            const parent = this.currentItem;
+            this.parentStack.push(parent);
+        },
 
-            const nextElement = this.$refs.next;
-            Object.assign(nextElement.style, {
-                left: `${this.panelWidth}px`,
-            });
-
-            const prevElement = this.$refs.prev;
-            Object.assign(prevElement.style, {
-                left: `-${this.panelWidth}px`,
-            });
+        // panel position controls
+        slidePanelNext() {
+            this.stagingPositionClass = 'prev';
+            this.nextPositionClass = 'staging';
+        },
+        slidePanelBack() {
+            this.stagingPositionClass = 'next';
+            this.prevPositionClass = 'staging';
+        },
+        homingPanelPosition() {
+            this.prevPositionClass = 'prev';
+            this.nextPositionClass = 'next';
+            this.stagingPositionClass = 'staging';
         },
 
         // utils
@@ -304,14 +318,13 @@ $panel-width: 300px;
 .Nav__panel {
     position: absolute;
     top: 0;
-    left: 0;
     z-index: 99999;
     height: 100vh;
     width: $panel-width;
     background-color: #fff;
 
-    &.translating {
-        transition: left .3s;
+    &.staging {
+        left: 0;
     }
 
     &.prev {
@@ -320,6 +333,10 @@ $panel-width: 300px;
 
     &.next {
         left: $panel-width;
+    }
+
+    &.translating {
+        transition: left .3s;
     }
 }
 
