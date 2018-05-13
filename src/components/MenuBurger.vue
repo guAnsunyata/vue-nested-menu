@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import MenuIcon from '../icons/MenuIcon';
+import MenuIcon from '../icons/MenuIcon.vue';
 
 export default {
     components: {

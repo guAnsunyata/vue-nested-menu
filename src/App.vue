@@ -52,11 +52,11 @@ import functionalityStyle from './mixins/functionalityStyle.mixin';
 import panelControl from './mixins/panelControl.mixin';
 import contentControl from './mixins/contentControl.mixin';
 
-import RightArrowIcon from './icons/RightArrowIcon';
-import LeftArrowIcon from './icons/LeftArrowIcon';
-import MenuBurger from './components/MenuBurger';
-import MenuShadow from './components/MenuShadow';
-import MenuPanel from './components/MenuPanel';
+import RightArrowIcon from './icons/RightArrowIcon.vue';
+import LeftArrowIcon from './icons/LeftArrowIcon.vue';
+import MenuBurger from './components/MenuBurger.vue';
+import MenuShadow from './components/MenuShadow.vue';
+import MenuPanel from './components/MenuPanel.vue';
 
 export default {
     mixins: [
@@ -82,7 +82,7 @@ export default {
         },
         menuSwitchSpeed: {
             type: Number,
-            default: 250,
+            default: 300,
         },
     },
     data() {
@@ -183,7 +183,7 @@ export default {
                 // homing
                 this.panel_homingPosition(); // reset panel position just like the beginning.
                 this.content_homingItemAfterNext(); // change item between these panels to meet updated panel position.
-            }, 300);
+            }, this.menuSwitchSpeed);
         },
         homingAfterTranslatingBack() {
             setTimeout(() => {
@@ -192,7 +192,7 @@ export default {
                 // homing
                 this.panel_homingPosition();
                 this.content_homingItemAfterBack();
-            }, 300);
+            }, this.menuSwitchSpeed);
         },
 
         // utils

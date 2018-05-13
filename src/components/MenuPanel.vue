@@ -30,8 +30,8 @@
 </template>
 
 <script>
-import RightArrowIcon from '../icons/RightArrowIcon';
-import LeftArrowIcon from '../icons/LeftArrowIcon';
+import RightArrowIcon from '../icons/RightArrowIcon.vue';
+import LeftArrowIcon from '../icons/LeftArrowIcon.vue';
 
 export default {
     components: {
