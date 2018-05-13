@@ -2,7 +2,7 @@
   "name": "vue-nested-menu",
   "version": "0.0.1",
   "description": "A simple, hands-on slide nested menu with a smooth slide effect.",
-  "main": "index.js",
+  "main": "dist/vue-nested-menu.js",
   "devDependencies": {
     "@storybook/addon-actions": "^4.0.0-alpha.4",
     "@storybook/addon-links": "^4.0.0-alpha.4",
