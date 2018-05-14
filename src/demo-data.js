@@ -4,14 +4,12 @@ const data = {
     children: [
         {
             title: `Today's Deals`,
-            children: [],
-        },
-        {
-            title: `Interesting Finds`,
+            link: `/`,
             children: [],
         },
         {
             title: `Your Recommendations`,
+            link: '/',
             children: [],
         },
         {
@@ -22,14 +20,17 @@ const data = {
                     children: [
                         {
                             title: `Amazon Music Unlimited`,
+                            link: `/`,
                             children: [],
                         },
                         {
                             title: `Prime Music`,
+                            link: `/`,
                             children: [],
                         },
                         {
                             title: `CDs and Vinyl`,
+                            link: `/`,
                             children: [],
                         },
                     ],
@@ -39,20 +40,24 @@ const data = {
                     children: [
                         {
                             title: `All Vedio`,
+                            link: '/',
                             children: [],
                         },
                         {
                             title: `Included with Prime`,
+                            link: '/',
                             children: [],
                         },
                         {
                             title: `Rent or Buy`,
+                            link: '/',
                             children: [],
                         },
                     ],
                 },
                 {
                     title: `Treasure Truck`,
+                    link: '/',
                     children: [],
                 },
                 {
@@ -60,18 +65,22 @@ const data = {
                     children: [
                         {
                             title: `Thai`,
+                            link: '/',
                             children: [],
                         },
                         {
                             title: `Chinese`,
+                            link: '/',
                             children: [],
                         },
                         {
                             title: `American`,
+                            link: '/',
                             children: [],
                         },
                         {
                             title: `Indian`,
+                            link: '/',
                             children: [],
                         },
                         {
@@ -79,10 +88,12 @@ const data = {
                             children: [
                                 {
                                     title: `Popular Restaurants 1`,
+                                    link: '/',
                                     children: [],
                                 },
                                 {
                                     title: `Popular Restaurants 2`,
+                                    link: '/',
                                     children: [],
                                 },
                             ],

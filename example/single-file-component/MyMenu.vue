@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Menu :list="list" />
+        <Menu :source="source" />
     </div>
 </template>
 
@@ -13,7 +13,7 @@ export default {
     },
     data() {
         return {
-            list: [
+            source: [
                 // ...
             ],
         };

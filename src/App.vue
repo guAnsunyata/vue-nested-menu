@@ -72,6 +72,10 @@ export default {
         MenuPanel,
     },
     props: {
+        source: {
+            type: Object,
+            default: () => demoData,
+        },
         panelWidth: {
             type: Number,
             default: 300,
@@ -87,13 +91,12 @@ export default {
     },
     data() {
         return {
-            data: demoData,
             isActive: false,
             isTranslating: false,
         };
     },
     mounted() {
-        this.content_currentItem = this.data;
+        this.content_currentItem = this.source;
     },
     computed: {
         currentItemHasParent() {
@@ -101,6 +104,11 @@ export default {
         },
         prevItemHasParent() {
             return this.content_parentStack.length >= 2;
+        },
+    },
+    watch: {
+        list() {
+            this.content_currentItem = this.source;
         },
     },
     methods: {
@@ -112,13 +120,7 @@ export default {
         },
         clickNextItem(targetItem) {
 
-            if (this.isTranslating) {
-                return;
-            }
-
-            // go to link
-            if (targetItem.children.length <= 0) {
-                // ...
+            if (this.isTranslating || targetItem.children.length <= 0) {
                 return;
             }
 

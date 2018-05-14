@@ -19,10 +19,15 @@
                     @click="handleItemClicked(item)"
                     class="Menu__item"
                 >
-                    <div class="text">{{ item.title }}</div>
-                    <span v-show="item.children.length > 0" class="arrow">
-                        <RightArrowIcon />
-                    </span>
+                    <template v-if="item.children.length > 0" :href="item.link">
+                        <div class="text">{{ item.title }}</div>
+                        <span class="arrow">
+                            <RightArrowIcon />
+                        </span>
+                    </template>
+                    <a v-else :href="item.link">
+                        <div class="text">{{ item.title }}</div>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -117,11 +122,17 @@ ul, li {
 }
 
 .Menu__item {
+    color: #4a4a4a;
     padding-left: 35px;
     height: 45px;
     display: flex;
     align-items: center;
     cursor: pointer;
+
+    a {
+        color: #4a4a4a;
+        text-decoration: none;
+    }
 
     .arrow {
         padding-top: 2px;
