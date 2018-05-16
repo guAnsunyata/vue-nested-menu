@@ -27,7 +27,7 @@ Vue.use(VueNestedMenu);
 *index.html*
 ```html
 <div id="app">
-  <vue-tree-navigation :source="menu"></vue-tree-navigation>
+  <vue-nested-menu :source="menu"></vue-nested-menu>
 </div>
 ```
 
