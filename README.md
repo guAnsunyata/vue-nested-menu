@@ -83,7 +83,7 @@ Vue.use(VueNestedMenu);
 *MyMenu.vue*
 ```html
 <template>
-  <vue-tree-navigation :source="menu" />
+  <vue-nested-menu :source="menu" />
 </template>
 
 <script>
