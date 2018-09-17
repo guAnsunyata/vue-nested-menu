@@ -1,7 +1,7 @@
 # vue-nested-menu [![Version](https://img.shields.io/npm/v/vue-nested-menu.svg)](https://www.npmjs.com/package/vue-nested-menu)
 A simple hands-on mobile nested menu UI component with a smooth slide animation.
 
-[demo](https://liliday.life/guansunyata/vue-nested-menu)
+[demo](https://guansunyata.me/guansunyata/vue-nested-menu)
 
 
 ## Installation
